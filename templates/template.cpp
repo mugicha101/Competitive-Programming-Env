@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+// TODO: rewrite segtrees using array
+
 using namespace std;
 #define INPUT true
 
@@ -81,100 +83,96 @@ struct SegTree {
 };
 
 // STANDARD SEG TREE
+// array based
 // inclusive queries
-struct SegTree {
-    typedef int T;
-    SegTree* left = nullptr;
-    SegTree* right = nullptr;
-    int size;
-    T val = 0;
-    SegTree(int size) : size(size) {
-        if (size == 1) return;
-        left = new SegTree(size >> 1);
-        right = new SegTree((size + 1) >> 1);
+class SegTree {
+    // config
+    using T = int; // type
+    const T ZRV = 0; // value to return if range is 0
+    const T IV = 0; // initial value of elements
+    inline T op(T l, T r) const { return l | r; } // range query operator
+    // config end
+
+    vector<T> nodes;
+
+    inline void asn(int i) {
+        nodes[i] = op(nodes[left(i)], nodes[right(i)]);
     }
 
-    void init(const vector<T>& arr, int offset = 0) {
-        if (size == 1) {
-            val = arr[offset];
-            return;
-        }
-        left->init(arr, offset);
-        right->init(arr, offset + (size >> 1));
-        val = left->val + right->val;
+    inline int left(int i) const {
+        return (i << 1) + 1;
     }
-    
-    ~SegTree() {
-        if (size == 1) return;
-        delete left;
-        delete right;
+
+    inline int right(int i) const {
+        return (i << 1) + 2;
+    }
+
+    inline int parent(int i) const {
+        return (i - 1) >> 1;
+    }
+
+    inline int elem(int i) const {
+        return (nodes.size() >> 1) + i;
+    }
+
+    inline bool leaf(int i) const {
+        return i >= elem(0);
+    }
+
+    T query_helper(int index, int size, int first, int last) const {
+        if (first >= size || last < 0) return ZRV;
+        if (first <= 0 && last >= size-1) return nodes[index];
+        size >>= 1;
+        return op(query_helper(left(index), size, first, last), query_helper(right(index), size, first - size, last - size));
+    }
+
+    void dump_helper(int index, int indent) {
+        cout << string(indent * 2, ' ') << "(" <<  nodes[index] << ")" << endl;
+        if (leaf(index)) return;
+
+        dump_helper(left(index), indent+1);
+        dump_helper(right(index), indent+1);
+    }
+
+public:
+
+    SegTree(int size) {
+        --size;
+        int n = 1;
+        while (size) {
+            n <<= 1;
+            size >>= 1;
+        }
+        nodes.resize(n * 2 - 1, IV);
+        for (int i = n-2; i >= 0; --i) {
+            asn(i);
+        }
+    }
+
+    T get(int index) const {
+        return nodes[elem(index)];
     }
 
     void update(int index, T value) {
-        if (size == 1) {
-            val = value;
-            return;
+        index = elem(index);
+        nodes[index] = value;
+        while (index) {
+            index = parent(index);
+            asn(index);
         }
-        if (index < (size >> 1)) left->update(index, value);
-        else right->update(index - (size >> 1), value);
-        val = left->val + right->val;
     }
 
-    T query(int first, int last) {
-        if (first >= size || last < 0) return 0;
-        if (first <= 0 && last >= size-1) return val;
-        return left->query(first, last) + right->query(first - (size >> 1), last - (size >> 1));
-    }
-};
-
-// AND SEG TREE
-// modify for any op
-struct BitSegTree {
-    typedef int T;
-    BitSegTree* left = nullptr;
-    BitSegTree* right = nullptr;
-    int size;
-    T val = 0;
-    BitSegTree(int size) : size(size) {
-        if (size == 1) return;
-        left = new BitSegTree(size >> 1);
-        right = new BitSegTree((size + 1) >> 1);
+    T query(int first, int last) const {
+        return query_helper(0, (nodes.size() + 1) >> 1, first, last);
     }
 
-    void init(const vector<T>& arr, int offset = 0) {
-        if (size == 1) {
-            val = arr[offset];
-            return;
-        }
-        left->init(arr, offset);
-        right->init(arr, offset + (size >> 1));
-        val = left->val & right->val;
-    }
-    
-    ~BitSegTree() {
-        if (size == 1) return;
-        delete left;
-        delete right;
-    }
-
-    void update(int index, T value) {
-        if (size == 1) {
-            val = value;
-            return;
-        }
-        if (index < (size >> 1)) left->update(index, value);
-        else right->update(index - (size >> 1), value);
-        val = left->val & right->val;
-    }
-
-    T query(int first, int last) {
-        if (first >= size || last < 0) return -1;
-        if (first <= 0 && last >= size-1) return val;
-        return left->query(first, last) & right->query(first - (size >> 1), last - (size >> 1));
+    void dump() {
+        dump_helper(0, 0);
     }
 };
 
 // LAZY PROP RANGE ADDITION QUERY SEG TREE
+// TODO: array based
 // modify for sum, prod, xor, etc.
 struct SegTree {
     typedef int T;
