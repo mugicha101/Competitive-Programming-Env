@@ -90,7 +90,7 @@ class SegTree {
     using T = int; // type
     const T ZRV = 0; // value to return if range is 0
     const T IV = 0; // initial value of elements
-    inline T op(T l, T r) const { return l | r; } // range query operator
+    inline T op(T l, T r) const { return l + r; } // range query operator
     // config end
 
     vector<T> nodes;
