@@ -6,7 +6,7 @@ if ($recompile) {
     if (Test-Path -Path './main.txt') {
         Remove-Item ./main.txt
     }
-    g++ -O3 -fpermissive -fassociative-math -ffast-math -ffloat-store ./main.cpp
+    g++ -std=c++20 -W -Wall -O3 -g ./main.cpp
 }
 if (Test-Path -Path './output.txt') {
     Remove-Item ./output.txt

@@ -1,4 +1,4 @@
-[ -e ./a.exe ] && rm ./a.out
+[ -e ./a.out ] && rm ./a.out
 [ -e ./main.txt ] && rm ./main.txt
 g++ -O3 -fpermissive -fassociative-math -ffast-math -ffloat-store ./main.cpp
 if [ -e ./a.out ]; then
