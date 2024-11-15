@@ -2,7 +2,7 @@
 
 using namespace std;
 
-// manacher's algorithm: precomputes longest palindrome centered at index i in O(N)
+// manacher's algorithm: computes longest palindrome centered at index i in O(N)
 // output format:
 //   pal = manacher(s)
 //   pal[i].first = length of longest odd length palindrome in s centered at index i
