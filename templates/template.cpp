@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <bits/stdc++.h>
 
 // TODO: rewrite segtrees using array
@@ -26,6 +27,10 @@ template<typename T_container, typename T = typename enable_if<!is_same<T_contai
 #define MOD 1000000007
 #define INF 1e9
 #define EPS 1e-9
+
+const ld ROT_HALF = 3.14159265358979323846L;
+const ld ROT_FULL = ROT_HALF * 2.L;
+const ld ROT_QUARTER = ROT_HALF * 0.5L;
 
 // all primes necessary for the prime factorization of a number <= 100,000
 const int primes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 
