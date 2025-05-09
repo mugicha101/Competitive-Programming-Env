@@ -37,7 +37,7 @@ vector<pair<int,int>> manacher(const string &s) {
   t += (char)2;
   vector<int> man = manacher_helper(t);
   vector<pair<int,int>> res(s.size());
-  for (int i = 0; i < s.size(); ++i) {
+  for (int i = 0; i < (int)s.size(); ++i) {
     res[i].first = man[i * 2 + 2] - 1; // odd
     res[i].second = man[i * 2 + 3] - 1; // even
   }
@@ -52,7 +52,7 @@ vector<int> manacher_odd(const string &s) {
   t += (char)2;
   vector<int> man = manacher_helper(t);
   vector<int> res(man.size() - 2);
-  for (int i = 0; i < s.size(); ++i) {
+  for (int i = 0; i < (int)s.size(); ++i) {
     res[i] = man[i+1] * 2 - 1;
   }
   return res;

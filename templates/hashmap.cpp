@@ -29,4 +29,4 @@ struct chash { // To use most bits rather than just the lowest ones:
 */
 
 template<typename V>
-using fast_unordered_map = __gnu_pbds::gp_hash_table<ll,int,chash>;
+using fast_unordered_map = __gnu_pbds::gp_hash_table<ll,V,chash>;
