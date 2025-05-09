@@ -142,3 +142,69 @@ public:
         }
     }
 };
+
+// keeps track of length of covered range of intervals
+// lazy prop segtree
+struct ItvTree {
+    ItvTree *left = nullptr;
+    ItvTree *right = nullptr;
+    int lx; int rx; // covered range
+    int count = 0; // number of times completely covered by an interval
+    int subCoverLen  = 0; // length of covered range of children (if count > 0, the true cover is just rx - lx)
+
+    // note: points must be sorted
+    ItvTree(vector<int> &points, int begin = 0, int end = -1) {
+        if (end == -1) end = points.size() - 1;
+        int itvs = end - begin;
+        lx = points[begin];
+        rx = points[end];
+        if (itvs >= 2) {
+            int mid = begin + (itvs >> 1);
+            left = new ItvTree(points, begin, mid);
+            right = new ItvTree(points, mid, end);
+        }
+    }
+
+    // note: if input values are not valid points, will fail assertion
+
+    // gets cover length of range [l, r]
+    int query(int l, int r) {
+        if (r <= lx || l >= rx) return 0;
+        if (count > 0) return min(r, rx) - max(l, lx);
+        if (l <= lx && r >= rx) return subCoverLen;
+        assertNonleaf(l, r);
+        return left->query(l, r) + right->query(l, r);
+    }
+
+    // inserts an interval
+    // returns true iff coverLen changed
+    bool insert(int l, int r) {
+        if (r <= lx || l >= rx) return false;
+        if (l <= lx && r >= rx) return ++count == 1;
+        assertNonleaf(l, r);
+        if (!left->insert(l, r) & !right->insert(l, r)) return false;
+        subCoverLen = left->coverLen() + right->coverLen();
+        return count <= 0;
+    }
+
+    // removes an interval
+    // returns true iff coverLen changed
+    bool erase(int l, int r) {
+        if (r <= lx || l >= rx) return false;
+        if (l <= lx && r >= rx) return --count == 0;
+        assertNonleaf(l, r);
+        if (!left->erase(l, r) & !right->erase(l, r)) return false;
+        subCoverLen = left->coverLen() + right->coverLen();
+        return count <= 0;
+    }
+
+    inline int len() const { return rx - lx; }
+    inline bool leaf() const { return !left; }
+    inline int coverLen() const { return count > 0 ? len() : subCoverLen; }
+    inline void assertNonleaf(int opL, int opR) const {
+        if (leaf()) {
+            cerr << "is a leaf: [" << lx << "," << rx << "] op range: [" << opL << "," << opR << "]" << endl;
+            exit(-1);
+        }
+    }
+};
