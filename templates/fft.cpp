@@ -151,3 +151,4 @@ int main() {
     for (int c : C)
         cout << c << " ";
     cout << endl << "time in ms: " << (calcEnd - calcStart).count() / 1000 << endl;
+}

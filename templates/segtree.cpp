@@ -208,3 +208,63 @@ struct ItvTree {
         }
     }
 };
+
+// lis tree
+// st[i] = length of lis at rank i (need to rerank before this)
+class SegTree {
+    // config
+    using T = pair<int,int>; // type
+    const T ZRV = {0,0}; // value to return if range is 0
+    const T IV = {0,0}; // initial value of elements
+    inline T op(T l, T r) const { return l.first == r.first ? make_pair(l.first, (l.second + r.second) % MOD) : max(l, r); } // range query operator
+    // config end
+
+    vector<T> nodes;
+
+    inline void asn(int i) { nodes[i] = op(nodes[left(i)], nodes[right(i)]); }
+    inline int left(int i) const { return (i << 1) + 1; }
+    inline int right(int i) const { return (i << 1) + 2; }
+    inline int parent(int i) const { return (i - 1) >> 1; }
+    inline int elem(int i) const { return (nodes.size() >> 1) + i; }
+    inline bool leaf(int i) const { return i >= elem(0); }
+
+    T query_helper(int index, int size, int first, int last) const {
+        if (first >= size || last < 0) return ZRV;
+        if (first <= 0 && last >= size-1) return nodes[index];
+        size >>= 1;
+        return op(query_helper(left(index), size, first, last), query_helper(right(index), size, first - size, last - size));
+    }
+
+    void dump_helper(int index, int indent) const {
+        cout << string(indent * 2, ' ') << "(" <<  nodes[index] << ")" << endl;
+        if (leaf(index)) return;
+        dump_helper(left(index), indent+1);
+        dump_helper(right(index), indent+1);
+    }
+
+public:
+
+    SegTree(int size) {
+        --size;
+        int n = 1;
+        while (size) {
+            n <<= 1;
+            size >>= 1;
+        }
+        nodes.resize(n * 2 - 1, IV);
+        for (int i = n-2; i >= 0; --i) asn(i);
+    }
+
+    T get(int index) const { return nodes[elem(index)]; }
+    T query(int first, int last) const { return query_helper(0, (nodes.size() + 1) >> 1, first, last); }
+    void dump() const { dump_helper(0, 0); }
+
+    void assign(int index, T value) {
+        index = elem(index);
+        nodes[index] = value;
+        while (index) {
+            index = parent(index);
+            asn(index);
+        }
+    }
+};

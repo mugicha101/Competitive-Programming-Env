@@ -6,6 +6,7 @@ using namespace std;
 typedef long long ll;
 
 // extended euclidean algorithm
+// O(lg(min(a,b)))
 void eeHelper(ll a, ll b, tuple<ll,ll,ll> &res) {
     if (b == 0) {
         res = {a, 1, 0};
@@ -26,4 +27,13 @@ tuple<ll,ll,ll> extendedEuclid(ll a, ll b) {
 ll invMod(ll a, ll m) {
     auto &&[d, x, y] = extendedEuclid(a, m);
     return d == 1 ? ((x % m) + m) % m : -1;
+}
+
+// nCk
+ll nCk(ll n, ll k) {
+    ll r = 1;
+    for (ll i = 1; i <= k; ++i) {
+        r = r * (n - k + i) / i;
+    }
+    return r;
 }

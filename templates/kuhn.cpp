@@ -6,6 +6,7 @@ using namespace std;
 // TODO: DEBUG
 // max matching on bipartite graph (max size set of non-touching edges)
 // maximum independent set size = # of vertices - |max matching size| (max number of nonadjacent nodes)
+// can also use max flow ford-fulkerson to solve
 // O(VE)
 struct Khun {
     int n, k;
