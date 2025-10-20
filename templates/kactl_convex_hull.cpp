@@ -82,3 +82,54 @@ vector<int> convexHull(const vector<P>& S) {
 	l.insert(l.end(), u.rbegin()+1, u.rend()-1);
 	return l;
 }
+
+// convex hull trick:
+// dp[i] = f(i) + max(m(k) * x(i) + b(k))
+// x(i) and m(i) both monotonically increase (if x(i) doesn't use Li Chao tree)
+// let L(k,i) = m(k) * x(i) + b(k)
+// want to maintain hull of lines and max line at current x(i)
+// let deque<int> cht be the hull
+// when advancing to i, check if L(cht[0],i) < L(cht[1],i) if so cht.pop_front()
+// dp[i] = f(i) + max(m(cht[0]) * x(i) + b(cht[0]))
+// to ensure hull maintained after adding line L(i,*), need to check that hull lines not dominated by L(i,*)
+// this can be done as follows:
+// while lineIntersection(L(cht[-2],*),L(cht[-1],*)) >= lineIntersection(L(cht[-2],*),L(i,*)):
+//     cht.pop_back() since this means L(cht[-2],*) and L(i,*) dominates L(cht[-1],*)
+
+// template for max cht
+// dp[i] = f(i) + max(m(i) * x(i) + b(i))
+// for min cht, flip M and B and dp[i] = f(i) - max(m(i) * x(i) + b(i))
+auto F = [&](int i) { return _ };
+auto M = [&](int k) { return _ };
+auto X = [&](int i) { return _ };
+auto B = [&](int k) { return _ };
+auto L = [&](int k, int i) { return M(k) * X(i) + B(k); };
+// get intersection of lines i and j in fraction form
+auto lineInt = [&](int i, int j) -> pair<ll,ll> {
+		pair<ll,ll> ret = make_pair(B(j) - B(i), M(i) - M(j));
+		if (ret.second < 0) {
+				ret.first = -ret.first;
+				ret.second = -ret.second;
+		}
+		ll d = gcd(abs(ret.first), abs(ret.second));
+		ret.first /= d;
+		ret.second /= d;
+		return ret;
+};
+auto fracGeq = [](pair<ll,ll> a, pair<ll,ll> b) {
+		return (__int128_t)a.first * (__int128_t)b.second >= (__int128_t)b.first * (__int128_t)a.second;
+};
+deque<int> cht;
+cht.push_back(0);
+for (int i = 1; i < n; ++i) {
+		while (cht.size() > 1 && L(cht[1],i) >= L(cht[0],i)) cht.pop_front();
+		dp[i] = F(i) + L(cht[0],i);
+
+		// given last 2 lines L_a, L_b and new line L_i
+		// if L_b < L_a and L_i then pop L_b
+		// repeat until false
+		while (cht.size() >= 2 && fracGeq(lineInt(cht[cht.size()-2], cht.back()), lineInt(cht[cht.size()-2], i)))
+				cht.pop_back();
+		cht.push_back(i);
+}
+cout << dp[n-1] << endl;

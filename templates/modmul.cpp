@@ -20,3 +20,11 @@ ull invmod(ull a, ull p) {
     }
     return result;
 }
+
+// CRT Chinese Remainder Theorem:
+// given pairwise coprime m_1, m_2, ...
+// find x mod m_1 * m_2 * ... where x mod m_i = a_i mod m_i
+// M = m_1 * m_2 * ...
+// M_i = M / m_i
+// N_i = modinv(M_i mod m_i)
+// x mod M = sum(a_i * M_i * N_i) mod M
