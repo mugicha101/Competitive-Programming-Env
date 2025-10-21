@@ -8,6 +8,7 @@
  * Time: $O(V^2\sqrt E)$
  * Status: Tested on Kattis and SPOJ, and stress-tested
  */
+// BETTER ON DENSE THAN DINICS
 #pragma once
 
 struct PushRelabel {

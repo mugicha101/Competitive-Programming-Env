@@ -8,6 +8,7 @@
  * bipartite matching. Status: Tested on SPOJ FASTFLOW and SPOJ MATCHING,
  * stress-tested
  */
+// BETTER ON SPARSE THAN PUSH RELABEL
 #pragma once
 
 #include <bits/stdc++.h>
