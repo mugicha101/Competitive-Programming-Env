@@ -71,9 +71,28 @@ void pad(vector<cnum>& arr) {
 
 // multiplies polynomials represented by the coefficient arrays A and B
 // returns a coefficient array
-vector<cnum> multiplyPolynomials(vector<cnum> A, vector<cnum> B) {
+template<typename T>
+vector<T> multiplyPolynomials(const vector<T> &A, const vector<T> &B) {
+    vector<cnum> cA(A.size());
+    vector<cnum> cB(B.size());
+    for (int i = 0; i < (int)A.size(); ++i) cA[i] = (cnum)A[i];
+    for (int i = 0; i < (int)A.size(); ++i) cB[i] = (cnum)B[i];
+    vector<cnum> cC = multiplyPolynomials(cA, cB);
+    vector<T> C(cC.size());
+    for (int i = 0; i < (int)cC.size(); ++i) {
+        if constexpr (std::is_integral_v<T>) C[i] = (T)round(cC[i].real());
+        else (T)cC[i].real();
+    }
+    return C;
+}
+
+template<>
+vector<cnum> multiplyPolynomials<cnum>(const vector<cnum> &oA, const vector<cnum> &oB) {
+    vector<cnum> A = oA;
+    vector<cnum> B = oB;
+
     // pad length of A and B to account for larger output C
-    unsigned int outputSize = A.size() + B.size();
+    size_t outputSize = A.size() + B.size();
     while (A.size() < outputSize)
         A.emplace_back(0);
     while (B.size() < outputSize)
@@ -88,7 +107,7 @@ vector<cnum> multiplyPolynomials(vector<cnum> A, vector<cnum> B) {
     // point-wise multiply to get dft of A * B (O(n))
     vector<cnum> dftC;
     dftC.reserve(dftA.size());
-    for (int i = 0; i < dftA.size(); ++i)
+    for (int i = 0; i < (int)dftA.size(); ++i)
         dftC.push_back(dftA[i] * dftB[i]);
 
     // inverse dft
@@ -100,55 +119,5 @@ vector<cnum> multiplyPolynomials(vector<cnum> A, vector<cnum> B) {
     return C;
 }
 
-// calculates {a + b | a in A and b in B}
-// preconditions: A.size() == B.size() == n, 0 <= A[i], B[i] <= 10n, all elements in A and B are distinct integers
-vector<int> cartesianSum(const vector<int>& A, const vector<int>& B) {
-    int n = (int)A.size();
-
-    // get input freq arrays (O(n))
-    vector<cnum> freqA(n * 10 + 1);
-    vector<cnum> freqB(n * 10 + 1);
-    for (int a : A)
-        freqA[a] += 1;
-    for (int b : B)
-        freqB[b] += 1;
-
-    // multiply polynomials (O(nlgn))
-    vector<cnum> freqC = multiplyPolynomials(freqA, freqB);
-
-    // convert to output array (O(n))
-    vector<int> C;
-    for (int c = 0; c < freqC.size(); ++c) {
-        int amount = (int)round(freqC[c].real());
-        for (int i = 0; i < amount; ++i)
-            C.push_back(c);
-    }
-    return C;
-}
-
-// driver code
-int main() {
-    ios_base::sync_with_stdio(false);
-
-    // define A and B
-    const int n = 1000;
-    vector<int> A;
-    vector<int> B;
-    random_device rd;
-    mt19937 rGen(rd());
-    uniform_int_distribution<int> rDistr(0, n * 10);
-    while (A.size() < n) {
-        A.push_back(rDistr(rGen));
-        B.push_back(rDistr(rGen));
-    }
-
-    // calculate cartesian sum of A and B
-    auto calcStart = chrono::high_resolution_clock::now();
-    vector<int> C = cartesianSum(A, B);
-    auto calcEnd = chrono::high_resolution_clock::now();
-
-    // output result
-    for (int c : C)
-        cout << c << " ";
-    cout << endl << "time in ms: " << (calcEnd - calcStart).count() / 1000 << endl;
-}
+// cartesian sum: treat numbers as exponents
+// A + B = multiplyPolynomials(A, B)
