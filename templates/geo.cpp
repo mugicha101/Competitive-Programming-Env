@@ -14,7 +14,7 @@ bool angleCmp(pair<T,T> a, pair<T,T> b) {
     return aHalf == bHalf ? cross == 0 ? ax * ax + ay * ay < bx * bx + by * by : cross > 0 : aHalf;
 }
 
-// get value v representing separation (not actual separation, but can use for comparisons)
+// get value v representing separation (    t actual separation, but can use for comparisons)
 // v = a dot b / (mag(a) * mag(b))
 template<typename T>
 bool sepRank(pair<T,T> a, pair<T,T> b) {

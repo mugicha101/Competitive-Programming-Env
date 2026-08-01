@@ -9,23 +9,26 @@
  * Status: Tested on Kattis and SPOJ, and stress-tested
  */
 // BETTER ON DENSE THAN DINICS
+// CALC DOES NOT WORK MORE THAN ONCE (call reset)
 #pragma once
 
 struct PushRelabel {
     struct Edge {
         int dest, back;
-        ll f, c;
+        ll f, c, oc;
     };
     vector<vector<Edge>> g;
     vector<ll> ec;
     vector<Edge*> cur;
     vector<vector<int>> hs; vector<int> H;
-    PushRelabel(int n) : g(n), ec(n), cur(n), hs(2*n), H(n) {}
+    vector<int> co;
+    PushRelabel(int n) : g(n), ec(n), cur(n), hs(2*n), H(n), co(2*n) {}
 
     void addEdge(int s, int t, ll cap, ll rcap=0) {
         if (s == t) return;
-        g[s].push_back({t, (int)g[t].size(), 0, cap});
-        g[t].push_back({s, (int)g[s].size()-1, 0, rcap});
+        assert(cap>=0);
+        g[s].push_back({t, (int)g[t].size(), 0, cap, cap});
+        g[t].push_back({s, (int)g[s].size()-1, 0, rcap, rcap});
     }
 
     void addFlow(Edge& e, ll f) {
@@ -36,7 +39,7 @@ struct PushRelabel {
     }
     ll calc(int s, int t) {
         int v = (int)g.size(); H[s] = v; ec[t] = 1;
-        vector<int> co(2*v); co[0] = v-1;
+        co[0] = v-1;
         for (int i = 0; i < v; ++i) cur[i] = g[i].data();
         for (Edge& e : g[s]) addFlow(e, e.c);
 
@@ -57,4 +60,47 @@ struct PushRelabel {
         }
     }
     bool leftOfMinCut(int a) { return H[a] >= (int)g.size(); }
+    void reset() {
+        for (auto &row : g) {
+            for (auto &e : row) {
+                e.f = 0;
+                e.c = e.oc;
+            }
+        }
+        fill(ec.begin(), ec.end(), 0);
+        fill(H.begin(), H.end(), 0);
+        fill(cur.begin(), cur.end(), nullptr);
+        for (auto &v : hs) v.clear();
+    }
 };
+
+/**
+ * Author: chilli, Takanori MAEHARA
+ * Date: 2020-04-03
+ * License: CC0
+ * Source: https://github.com/spaghetti-source/algorithm/blob/master/graph/gomory_hu_tree.cc#L102
+ * Description: Given a list of edges representing an undirected flow graph,
+ * returns edges of the Gomory-Hu tree. The max flow between any pair of
+ * vertices is given by minimum edge weight along the Gomory-Hu tree path.
+ * Time: $O(V)$ Flow Computations
+ * Status: Tested on CERC 2015 J, stress-tested
+ *
+ * Details: The implementation used here is not actually the original
+ * Gomory-Hu, but Gusfield's simplified version: "Very simple methods for all
+ * pairs network flow analysis". PushRelabel is used here, but any flow
+ * implementation that supports `leftOfMinCut` also works.
+ */
+ 
+typedef array<ll, 3> Edge;
+vector<Edge> gomoryHu(int N, vector<Edge> ed) {
+    vector<Edge> tree;
+    vector<int> par(N);
+    PushRelabel D(N);
+    for (Edge t : ed) D.addEdge(t[0], t[1], t[2], t[2]);
+    for (int i = 1; i < N; ++i) {
+        D.reset();
+        tree.push_back({i, par[i], D.calc(i, par[i])});
+        for (int j = i+1; j < N; ++j) if (par[j] == par[i] && D.leftOfMinCut(j)) par[j] = i;
+    }
+    return tree;
+}

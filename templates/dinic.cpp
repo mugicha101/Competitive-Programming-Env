@@ -9,6 +9,7 @@
  * stress-tested
  */
 // BETTER ON SPARSE THAN PUSH RELABEL
+// CALC DOES NOT WORK MORE THAN ONCE (call reset)
 #pragma once
 
 #include <bits/stdc++.h>
@@ -91,4 +92,5 @@ struct Dinic {
     return make_pair(mc, visited);
   }
   bool leftOfMinCut(int a) { return lvl[a] != 0; }
+  void reset() { for (auto &row : adj) for (auto &e : row) e.c = e.oc; }
 };

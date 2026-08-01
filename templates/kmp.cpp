@@ -6,7 +6,7 @@ using namespace std;
 // knuth morris pratt string matching
 struct KMP {
     // returns p where p[i] = length of longest prefix of P that is a proper suffix of P[0..<i] (proper meaning cannot equal P[0..<i])
-    vector<int> prefixFunc(const string &s) {
+    static vector<int> prefixFunc(const string &s) {
         vector<int> p(s.size());
         int k = 0;
         for (int q = 1; q < (int)s.size(); ++q) {

@@ -30,7 +30,7 @@ struct MCMF {
 
 	MCMF(int N) : N(N), ed(N), seen(N), dist(N), pi(N), par(N) {}
 
-	void addEdge(int from, int to, ll cap, ll cost = 1) {
+	void addEdge(int from, int to, ll cap, ll cost) {
 		if (from == to) return;
 		ed[from].push_back(edge{ from,to,(int)ed[to].size(),cap,cost,0 });
 		ed[to].push_back(edge{ to,from,(int)ed[from].size()-1,0,-cost,0 });
@@ -64,6 +64,7 @@ struct MCMF {
 	}
 
 	pair<ll, ll> maxflow(int s, int t) {
+		setpi(s);
 		ll totflow = 0, totcost = 0;
 		while (path(s), seen[t]) {
 			ll fl = INF;
