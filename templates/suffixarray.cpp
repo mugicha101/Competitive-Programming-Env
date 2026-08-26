@@ -5,7 +5,7 @@ using namespace std;
 
 struct SuffixArray {
     vector<vector<int>> c; // suffix equivalence classes
-    vector<int> p; // final level permutation
+    vector<int> p; // final level permutation (note: p[i] is ith smallest suffix, p[0] is "\0")
     int lvls = 0;
     SuffixArray(string s) {
         int ogSize = (int)s.size();
