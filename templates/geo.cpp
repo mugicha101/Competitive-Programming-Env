@@ -52,8 +52,7 @@ F pip(const vector<pair<T,T>> &poly, pair<T,T> p) {
 
         // get dist to projection point q (floating point)
         F qm = (F)clamp(dot, (CT)0, ds) / ds;
-        F rx = qm * dx - px;
-        F ry = qm * dy - py;
+        F rx = qm * dx - px, ry = qm * dy - py;
         res = min(res, rx * rx + ry * ry);
     }
     return w ? -res : res;
@@ -129,4 +128,36 @@ double circlePoly(P c, double r, vector<P> ps) {
 	rep(i,0,sz(ps))
 		sum += tri(ps[i] - c, ps[(i + 1) % sz(ps)] - c);
 	return sum;
+}
+
+// squared distance between line segment [a,b] and point p
+// T: input number type, CT: calculation number type (should be double T), F: output float type
+template<typename T, typename CT = i128, typename F = ld>
+F pointSegDistSqd(pair<T,T> a, pair<T,T> b, pair<T,T> p) {
+    CT dx = (CT)b.first - a.first, dy = (CT)b.second - a.second;
+    CT px = (CT)p.first - a.first, py = (CT)p.second - a.second;
+    CT ds = dx * dx + dy * dy;
+    if (ds == 0) return px * px + py * py;
+    F qm = (F)clamp(px * dx + py * dy, (CT)0, ds) / ds;
+    F rx = qm * dx - px, ry = qm * dy - py;
+    return rx * rx + ry * ry;
+}
+
+// returns true iff line segments [a,b] and [c,d] intersect
+// non-colinear: check cross product of endpoints on opposite sides of other segment
+// colinear: if cross product 0, on the extended line so check that on the segment using bounds check
+// T: input number type, CT: calculation number type (should be double T)
+template<typename T, typename CT = i128>
+bool segsIntersect(pair<T,T> a, pair<T,T> b, pair<T,T> c, pair<T,T> d) {
+    auto cross = [](pair<T,T> a, pair<T,T> b, pair<T,T> p) {
+        return (CT)(b.first - a.first) * (p.second - a.second) - (CT)(b.second - a.second) * (p.first - a.first);
+    };
+    auto on = [&](auto a, auto b, auto p) {
+        return min(a.first, b.first) <= p.first && min(a.second, b.second) <= p.second && p.first <= max(a.first, b.first) && p.second <= max(a.second, b.second);
+    };
+    CT ca = cross(c,d,a);
+    CT cb = cross(c,d,b);
+    CT cc = cross(a,b,c);
+    CT cd = cross(a,b,d);
+    return (ca == 0 && on(c,d,a)) || (cb == 0 && on(c,d,b)) && (cc == 0 || on(a,b,c)) || (cd == 0 && on(a,b,d)) || ((cc > 0 ^ cd > 0) && (ca > 0 ^ cb > 0));
 }
