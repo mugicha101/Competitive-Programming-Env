@@ -58,6 +58,13 @@ F pip(const vector<pair<T,T>> &poly, pair<T,T> p) {
     return w ? -res : res;
 }
 
+// returns value indicating side that p is on of vector v
+// neg: right, zero: mid, pos: left
+template<typename T, typename CT = i128>
+CT cross2D(pair<T,T> v, pair<T,T> p) {
+    return (CT)v.first * p.second - (CT)v.second * p.first;
+}
+
 // KACTL
 
 /**
