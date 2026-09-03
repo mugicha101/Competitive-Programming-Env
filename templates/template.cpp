@@ -1,8 +1,5 @@
 #define _USE_MATH_DEFINES
 #include <bits/stdc++.h>
-
-#define _USE_MATH_DEFINES
-#include <bits/stdc++.h>
 #include <bits/extc++.h>
 
 using namespace std;
