@@ -12,6 +12,7 @@
 #pragma once
 
 using vi = vector<int>;
+using pii = pair<int,int>;
 struct RollbackUF {
 	vi e; vector<pii> st;
 	RollbackUF(int n) : e(n, -1) {}
