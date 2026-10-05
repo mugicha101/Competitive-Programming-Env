@@ -83,6 +83,62 @@ vector<int> convexHull(const vector<P>& S) {
 	return l;
 }
 
+/**
+ * Author: Oleksandr Bacherikov, chilli
+ * Date: 2019-05-05
+ * License: Boost Software License
+ * Source: https://codeforces.com/blog/entry/48868
+ * Description: Returns the two points with max distance on a convex hull (ccw,
+ * no duplicate/collinear points).
+ * Status: stress-tested, tested on kattis:roberthood
+ * Time: O(n)
+ */
+
+typedef Point<ll> P;
+array<P, 2> hullDiameter(vector<P> S) {
+	int n = sz(S), j = n < 2 ? 0 : 1;
+	pair<ll, array<P, 2>> res({0, {S[0], S[0]}});
+	rep(i,0,j)
+		for (;; j = (j + 1) % n) {
+			res = max(res, {(S[i] - S[j]).dist2(), {S[i], S[j]}});
+			if ((S[(j + 1) % n] - S[j]).cross(S[i + 1] - S[i]) >= 0)
+				break;
+		}
+	return res.second;
+}
+
+// TODO: make less scuffed
+// note: diameters can be mix of edges and non-edges
+typedef Point<ll> P;
+pair<i128,int> hullDiameterCount(vector<P> S) {
+	int n = sz(S), j = n < 2 ? 0 : 1;
+	pair<i128, array<P, 2>> res({0, {S[0], S[0]}});
+    vector<array<P,2>> arr;
+	for (int i = 0; i < j; ++i) {
+		for (;; j = (j + 1) % n) {
+            pair<i128, array<P, 2>> can = {(S[i] - S[j]).dist2(), {S[i], S[j]}};
+            if (can.first > res.first) {
+                res.first = can.first;
+                arr.clear();
+                arr.push_back(can.second);
+            } else if (can.first == res.first) {
+                arr.push_back(can.second);
+            }
+			if ((S[(j + 1) % n] - S[j]).cross(S[i + 1] - S[i]) >= 0)
+				break;
+		}
+    }
+
+    // remove duplicates
+    set<tuple<ll,ll,ll,ll>> u;
+    for (auto &p : arr) {
+        u.emplace(p[0].x, p[0].y, p[1].x, p[1].y);
+        u.emplace(p[1].x, p[1].y, p[0].x, p[0].y);
+    }
+
+	return {res.first, (int)u.size() >> 1};
+}
+
 // convex hull trick:
 // dp[i] = f(i) + max(m(k) * x(i) + b(k))
 // x(i) and m(i) both monotonically increase (if x(i) doesn't use Li Chao tree)
