@@ -92,7 +92,7 @@ class LazySegTree {
     T update_helper(int index, int size, int first, int last, L value) {
         if (first >= size || last < 0) return ZRV;
         if (first <= 0 && last >= size-1) {
-            lazy[index] += value;
+            lazy[index] = op(lazy[index], value);
             return at(index, size);
         }
         update_helper(left(index), size >> 1, first, last, value);
@@ -122,10 +122,9 @@ public:
         while (size) { n <<= 1; size >>= 1; }
         nodes.resize(n * 2 - 1, IV);
         lazy.resize(n * 2 - 1, 0);
-        for (int i = n-2; i >= 0; --i) asn(i, 1);
+        for (int i = n-2; i >= 0; --i) asn(i, IV);
     }
 
-    void assign(int index, L value) { update(index, index, value - query(index, index)); }
     void update(int first, int last, L value) { update_helper(0, (nodes.size() + 1) >> 1, first, last, value); }
     T query(int first, int last) const { return query_helper(0, (nodes.size() + 1) >> 1, first, last); }
     void dump() const { dump_helper(0, 0, (nodes.size() + 1) >> 1); }
