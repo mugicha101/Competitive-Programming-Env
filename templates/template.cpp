@@ -150,8 +150,3 @@ struct hash_pair {
 #define pause() this_thread::sleep_for(10ms)
 #define getx(a) a.first
 #define gety(a) a.second
-
-int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    cout << fixed << setprecision(9);
-}
